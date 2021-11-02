@@ -31,14 +31,14 @@
                             <td>${prod.getName()}</td>
                             <td>${prod.getPriceVND()}</td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/administrator/customers?act=show&id=${prod.getId()}"
+                                <a href="${pageContext.request.contextPath}/products?act=show&id=${prod.getId()}"
                                    class="btn btn-secondary mr-1" data-toggle="tooltip"
                                    data-placement="top"
                                    title="View">Xem</a>
-                                <a href="${pageContext.request.contextPath}/administrator/customers?act=edit&id=${prod.getId()}"
+                                <a href="${pageContext.request.contextPath}/products?act=edit&id=${prod.getId()}"
                                    class="btn btn-info mr-1" data-toggle="tooltip" data-placement="top"
                                    title="Edit">Sửa</a>
-                                <a href="${pageContext.request.contextPath}/administrator/customers?act=delete&id=${prod.getId()}"
+                                <a href="${pageContext.request.contextPath}/products?act=delete&id=${prod.getId()}"
                                    class="btn btn-danger" data-toggle="tooltip" data-placement="top"
                                    title="Delete"
                                    onclick="return confirm('Are you sure you want to delete this item?');">Xóa</a>
