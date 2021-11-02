@@ -28,6 +28,7 @@ public class SessionFilter implements Filter {
     // this value is null, this filter instance is not currently
     // configured. 
     private FilterConfig filterConfig = null;
+    private int maxSession;
     
     public SessionFilter() {
     }    
@@ -160,6 +161,8 @@ public class SessionFilter implements Filter {
      */
     public void init(FilterConfig filterConfig) {        
         this.filterConfig = filterConfig;
+        this.maxSession = Integer.parseInt(filterConfig.getInitParameter("maxSession"));
+        System.out.println("Max session: " + this.maxSession);
         if (filterConfig != null) {
             if (debug) {                
                 log("SessionFilter:Initializing filter");
