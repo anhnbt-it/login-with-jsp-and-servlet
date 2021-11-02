@@ -15,4 +15,8 @@
     <body>
         <div class="container">
             <h1 class="jumbotron">JSP&Servlet Demo</h1>
-            <p><a href="${pageContext.request.contextPath}">Home</a> | <a href="${pageContext.request.contextPath}/login.jsp">Login</a></p>
+            <p>
+                <a href="${pageContext.request.contextPath}">Home</a> | 
+                <a href="${pageContext.request.contextPath}/login.jsp">Login</a> | 
+                <a href="${pageContext.request.contextPath}/products">Products</a> | 
+            </p>

@@ -1,5 +1,5 @@
 /*
- * Â© Copyright 2021 by AnhNBTâ„¢
+ * © Copyright 2021 by AnhNBT™
  */
 package vn.aptech.LoginDemoServlet;
 
@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
@@ -17,13 +19,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import vn.aptech.LoginDemoServlet.model.Product;
 
 /**
  *
  * @author Nguyen Ba Tuan Anh <anhnbt.it@gmail.com>
  */
-@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
-public class LoginServlet extends HttpServlet {
+@WebServlet(name = "ProductServlet", urlPatterns = {"/products"})
+public class ProductServlet extends HttpServlet {
+    private static final String SQL_SELECT_ALL = "SELECT * FROM products";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,26 +40,25 @@ public class LoginServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = null;
-        response.setContentType("text/html;charset=UTF-8");
+        request.getDispatcherType();
+        List<Product> products = new ArrayList<>();
+        RequestDispatcher dispatcher = request.getRequestDispatcher("home.jsp");
         try (Connection conn = DBConnection.getConnection()) {
-            String username = request.getParameter("username");
-            String password = request.getParameter("password");
-            String queryString = "SELECT * FROM users WHERE username = ? AND password = ?";
-            PreparedStatement pstmt = conn.prepareStatement(queryString);
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_ALL);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                request.setAttribute("username", username);
-                dispatcher = request.getRequestDispatcher("success.jsp");
-            } else {
-                dispatcher = request.getRequestDispatcher("error.jsp");
+            while (rs.next()) {
+                Product product = new Product();
+                product.setId(rs.getInt("id"));
+                product.setName(rs.getString("name"));
+                product.setPrice(rs.getDouble("price"));
+                products.add(product);
             }
+            request.setAttribute("products", products);
             dispatcher.forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
