@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -48,6 +49,8 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 request.setAttribute("username", username);
+                HttpSession session = request.getSession();
+                session.setAttribute("username", username);
                 dispatcher = request.getRequestDispatcher("success.jsp");
             } else {
                 dispatcher = request.getRequestDispatcher("error.jsp");

@@ -6,4 +6,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp"></jsp:include>
     <div>Welcome to Hà Nội Aptech</div>
+    <p>Max session = 
+        <%
+            out.println(application.getAttribute("count"));
+        %>
+    </p>
 <jsp:include page="footer.jsp"></jsp:include>

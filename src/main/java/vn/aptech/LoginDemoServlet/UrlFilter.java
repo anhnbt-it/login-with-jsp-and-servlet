@@ -10,33 +10,32 @@ import java.io.StringWriter;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Nguyen Ba Tuan Anh <anhnbt.it@gmail.com>
  */
-public class SessionFilter implements Filter {
-
+public class UrlFilter implements Filter {
+    
     private static final boolean debug = true;
 
     // The filter configuration object we are associated with.  If
     // this value is null, this filter instance is not currently
     // configured. 
     private FilterConfig filterConfig = null;
-    private int maxSession;
-
-    public SessionFilter() {
-    }
-
+    
+    public UrlFilter() {
+    }    
+    
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
-            log("SessionFilter:DoBeforeProcessing");
+            log("UrlFilter:DoBeforeProcessing");
         }
 
         // Write code here to process the request and/or response before
@@ -59,12 +58,12 @@ public class SessionFilter implements Filter {
 	    log(buf.toString());
 	}
          */
-    }
-
+    }    
+    
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
-            log("SessionFilter:DoAfterProcessing");
+            log("UrlFilter:DoAfterProcessing");
         }
 
         // Write code here to process the request and/or response after
@@ -98,24 +97,24 @@ public class SessionFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
+        
         if (debug) {
-            log("SessionFilter:doFilter()");
+            log("UrlFilter:doFilter()");
         }
-
+        
         doBeforeProcessing(request, response);
-
+        
         Throwable problem = null;
         try {
-            System.out.println("User call URL = " + req.getRequestURI());
-            System.out.println("User IP = " + req.getRemoteAddr());
-            int count = (int) req.getServletContext().getAttribute("count");
-            if (count < maxSession) {
-                chain.doFilter(request, response);
-            } else {
-                RequestDispatcher dispatcher = req.getRequestDispatcher("deny.jsp");
-                dispatcher.forward(request, response);
-            }
+            HttpServletRequest req = (HttpServletRequest) request;
+            String uri = req.getRequestURI();
+            long lastAccessTime = req.getSession().getLastAccessedTime();
+            long currentTime = System.currentTimeMillis();
+            HttpSession session = req.getSession();
+            System.out.println("uri: " + uri);
+            System.out.println("lastAccessTime: " + lastAccessTime);
+            System.out.println("currentTime: " + currentTime);
+            chain.doFilter(request, response);
         } catch (Throwable t) {
             // If an exception is thrown somewhere down the filter chain,
             // we still want to execute our after processing, and then
@@ -123,7 +122,7 @@ public class SessionFilter implements Filter {
             problem = t;
             t.printStackTrace();
         }
-
+        
         doAfterProcessing(request, response);
 
         // If there was a problem, we want to rethrow it if it is
@@ -158,19 +157,17 @@ public class SessionFilter implements Filter {
     /**
      * Destroy method for this filter
      */
-    public void destroy() {
+    public void destroy() {        
     }
 
     /**
      * Init method for this filter
      */
-    public void init(FilterConfig filterConfig) {
+    public void init(FilterConfig filterConfig) {        
         this.filterConfig = filterConfig;
-        this.maxSession = Integer.parseInt(filterConfig.getInitParameter("maxSession"));
-        System.out.println("Max session: " + this.maxSession);
         if (filterConfig != null) {
-            if (debug) {
-                log("SessionFilter:Initializing filter");
+            if (debug) {                
+                log("UrlFilter:Initializing filter");
             }
         }
     }
@@ -181,27 +178,27 @@ public class SessionFilter implements Filter {
     @Override
     public String toString() {
         if (filterConfig == null) {
-            return ("SessionFilter()");
+            return ("UrlFilter()");
         }
-        StringBuffer sb = new StringBuffer("SessionFilter(");
+        StringBuffer sb = new StringBuffer("UrlFilter(");
         sb.append(filterConfig);
         sb.append(")");
         return (sb.toString());
     }
-
+    
     private void sendProcessingError(Throwable t, ServletResponse response) {
-        String stackTrace = getStackTrace(t);
-
+        String stackTrace = getStackTrace(t);        
+        
         if (stackTrace != null && !stackTrace.equals("")) {
             try {
                 response.setContentType("text/html");
                 PrintStream ps = new PrintStream(response.getOutputStream());
-                PrintWriter pw = new PrintWriter(ps);
+                PrintWriter pw = new PrintWriter(ps);                
                 pw.print("<html>\n<head>\n<title>Error</title>\n</head>\n<body>\n"); //NOI18N
 
                 // PENDING! Localize this for next official release
-                pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n");
-                pw.print(stackTrace);
+                pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n");                
+                pw.print(stackTrace);                
                 pw.print("</pre></body>\n</html>"); //NOI18N
                 pw.close();
                 ps.close();
@@ -218,7 +215,7 @@ public class SessionFilter implements Filter {
             }
         }
     }
-
+    
     public static String getStackTrace(Throwable t) {
         String stackTrace = null;
         try {
@@ -232,9 +229,9 @@ public class SessionFilter implements Filter {
         }
         return stackTrace;
     }
-
+    
     public void log(String msg) {
-        filterConfig.getServletContext().log(msg);
+        filterConfig.getServletContext().log(msg);        
     }
-
+    
 }
